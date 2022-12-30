@@ -11,15 +11,11 @@ def xml_to_yolo(path):
         
         tree = ET.parse(xml_file)
         root = tree.getroot()
-        
-        size = root.find('size')
-        if size: #get size from xml file
-            w, h = int(size[0].text), int(size[1].text)
-
-        else:   #get size from img file
-            img_path = xml_file[:-4] + '.jpg'
-            img = mpimg.imread(img_path)
-            w, h = img.shape[:-1] 
+           
+        #get size from img file
+        img_path = xml_file[:-4] + '.jpg'
+        img = mpimg.imread(img_path)
+        w, h = img.shape[:-1] 
 
         pedals = []
         for children in root.findall('object'):
