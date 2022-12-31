@@ -72,7 +72,7 @@ def convert_to_yolov7(info_dict):
 
 
 def XMLtoYOLO(path): 
-  #just insert car_plate folder path like this path='/content/drive/MyDrive/carp_late/'  
+  #just insert car_plate folder path like this path='/content/drive/MyDrive/car_plate/'  
   searchxml   = os.path.join( path , "*" , "*.xml" )
   xmlfiles = sorted(glob.glob( searchxml ))
   for xml in xmlfiles:
