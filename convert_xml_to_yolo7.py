@@ -69,3 +69,14 @@ def convert_to_yolov7(info_dict):
       print_buffer.append("{} {:.3f} {:.3f} {:.3f} {:.3f}".format(class_id, b_center_x, b_center_y, b_width, b_height))
   save_file_name = ann[:-3] + 'txt'
   print("\n".join(print_buffer), file= open(save_file_name, "w"))        
+
+
+def XMLtoYOLO(path): 
+  #just insert car_plate folder path like this path='/content/drive/MyDrive/carp_late/'  
+  searchxml   = os.path.join( path , "*" , "*.xml" )
+  xmlfiles = sorted(glob.glob( searchxml ))
+  for xml in xmlfiles:
+    ann = xml
+    img = ann[:-3] + 'jpg'
+    info = extract_info_from_xml(ann)
+    convert_to_yolov7(info)
