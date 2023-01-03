@@ -50,7 +50,7 @@ def xml_to_yolo(path):
 #Convert min/max data to yolo format
 def convert(xmin, ymin, xmax, ymax, w, h):
     x_center = ((xmin + xmax) / 2) / w
-    y_center = ((ymin + ymax) / 2) / w
+    y_center = ((ymin + ymax) / 2) / h
     width = (xmax - xmin) / w
     height =(ymax - ymin) / h
     return [x_center, y_center, width, height]
