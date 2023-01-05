@@ -8,6 +8,24 @@ import xml.etree.ElementTree as ET
 from PIL import Image, ImageDraw
 import numpy as np
 
+# Function to combile train and validation files and remove validation folder
+def combine_train_valid(path):
+
+  source = path + 'validation'
+  destination = path + 'train'
+
+  # gather all files
+  allfiles = os.listdir(source)
+
+  # iterate on all files to move them to destination folder
+  for f in allfiles:
+    src_path = os.path.join(source, f)
+    dst_path = os.path.join(destination, f)
+    os.rename(src_path, dst_path)
+
+  # delete empty validation folder
+  os.rmdir(source)
+
 # Function to get the data from XML Annotation
 def extract_info_from_xml(xml_file):
     root = ET.parse(xml_file).getroot()
@@ -39,12 +57,12 @@ class_name_to_id_mapping = {"کل ناحیه پلاک": 0}
 
 
 # Convert the info dict to the required yolo format and write it to disk
-def convert_to_yolov7(info_dict):
+def convert_to_yolov7(info_dict, ann, img):
 
   print_buffer = []
     
     # For each bounding box
-  for b in info["bboxes"]:
+  for b in info_dict["bboxes"]:
     if b['class'] == 'کل ناحیه پلاک':
       try:
           class_id = class_name_to_id_mapping[b["class"]]
@@ -58,6 +76,7 @@ def convert_to_yolov7(info_dict):
       b_height   = (b["ymax"] - b["ymin"])
         
         # Normalise the co-ordinates by the dimensions of the image
+      #img = ann[:-3] + 'jpg'
       im=plt.imread(img)
       image_h, image_w, image_c = im.shape
       b_center_x /= image_w 
@@ -70,13 +89,66 @@ def convert_to_yolov7(info_dict):
   save_file_name = ann[:-3] + 'txt'
   print("\n".join(print_buffer), file= open(save_file_name, "w"))        
 
+#function to make desireable folders for image and labels
+def makefolder(path):
+  Paths=['train/images', 'train/labels', 'test/images', 'test/labels']
+  for p in Paths:
+    os.mkdir(path+p)
 
-def XMLtoYOLO(path): 
-  #just insert car_plate folder path like this path='/content/drive/MyDrive/car_plate/'  
+#function to move .jpg and .txt files to folders and remove .xml files
+def movtofoldertrain(path):
+  src = path + 'train'
+  dest1 = path + 'train/images'
+  dest2 = path + 'train/labels'
+  allfiles = os.listdir(src)
+  for f in allfiles:
+    print(f)
+    if f.endswith(".jpg"):
+      src_path = os.path.join(src, f)
+      dst_path = os.path.join(dest1, f)
+      os.rename(src_path, dst_path)
+    elif f.endswith(".txt"):
+      src_path = os.path.join(src, f)
+      dst_path = os.path.join(dest2, f)
+      os.rename(src_path, dst_path)
+    elif f.endswith(".xml"):
+      src_path = os.path.join(src, f)
+      os.remove(src_path)
+    else:
+      pass
+
+#function to move .jpg and .txt files to folders and remove .xml files
+def movtofoldertest(path):
+  src = path + 'test'
+  dest1 = path + 'test/images'
+  dest2 = path + 'test/labels'
+  allfiles = os.listdir(src)
+  for f in allfiles:
+    if f.endswith(".jpg"):
+      src_path = os.path.join(src, f)
+      dst_path = os.path.join(dest1, f)
+      os.rename(src_path, dst_path)
+    elif f.endswith(".txt"):
+      src_path = os.path.join(src, f)
+      dst_path = os.path.join(dest2, f)
+      os.rename(src_path, dst_path)
+    elif f.endswith(".xml"):
+      src_path = os.path.join(src, f)
+      os.remove(src_path)
+    else:
+      pass
+
+#final function
+#just insert car_plate folder path like this: path='/content/drive/MyDrive/car_plate/' 
+def XMLtoYOLO(path):  
+  combine_train_valid(path)
+  makefolder(path)
   searchxml   = os.path.join( path , "*" , "*.xml" )
   xmlfiles = sorted(glob.glob( searchxml ))
   for xml in xmlfiles:
     ann = xml
     img = ann[:-3] + 'jpg'
-    info = extract_info_from_xml(ann)
-    convert_to_yolov7(info)
+    info_dict = extract_info_from_xml(ann)
+    convert_to_yolov7(info_dict, ann, img)
+  movtofoldertrain(path)
+  movtofoldertest(path)
