@@ -53,7 +53,7 @@ def convert(xmin, ymin, xmax, ymax, w, h):
     y_center = ((ymin + ymax) / 2) / h
     width = (xmax - xmin) / w
     height =(ymax - ymin) / h
-    return [x_center, y_center, width, height]
+    return [0, x_center, y_center, width, height]
 
 
 #train test validation
