@@ -46,7 +46,7 @@ def extract_info_from_xml(xml_file):
                     
               elif subelem.tag == "bndbox":
                   for subsubelem in subelem:
-                       bbox[subsubelem.tag] = int(subsubelem.text)            
+                       bbox[subsubelem.tag] = int(float(subsubelem.text))           
           info_dict['bboxes'].append(bbox)
     
     return info_dict
@@ -142,13 +142,25 @@ def movtofoldertest(path):
 #just insert car_plate folder path like this: path='/content/drive/MyDrive/car_plate/' 
 def XMLtoYOLO(path):  
   combine_train_valid(path)
+  print("combine ok")
   makefolder(path)
+  print("make folders ok")
+
   searchxml   = os.path.join( path , "*" , "*.xml" )
   xmlfiles = sorted(glob.glob( searchxml ))
+  i=0
   for xml in xmlfiles:
-    ann = xml
-    img = ann[:-3] + 'jpg'
-    info_dict = extract_info_from_xml(ann)
-    convert_to_yolov7(info_dict, ann, img)
+    try:
+     ann = xml
+     img = ann[:-3] + 'jpg'
+     print(i,xml)
+     info_dict = extract_info_from_xml(ann)
+     convert_to_yolov7(info_dict, ann, img)
+     i = i + 1
+    except:
+      print(xml)
+  print(".txt ok")    
   movtofoldertrain(path)
+  print("movtofoldertrain ok")
   movtofoldertest(path)
+  print("movtofoldertest ok")
